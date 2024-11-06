@@ -59,39 +59,43 @@ Public Class frmMain
             End Try
         Next
 
-        ' Step 2: Rename folders containing the old solution name
-        Dim directories = Directory.GetDirectories(solutionDirectory, "*", SearchOption.AllDirectories).OrderByDescending(Function(d) d.Length).ToList()
+        ' Step 2: Rename folders only if checkbox is checked 
+        If chkRenameFolder.Checked Then
+            Dim directories = Directory.GetDirectories(solutionDirectory, "*", SearchOption.AllDirectories).OrderByDescending(Function(d) d.Length).ToList()
 
-        For Each directoryPath In directories
-            If Path.GetFileName(directoryPath).Contains(currentSolutionName) Then
-                Try
-                    Dim newDirectoryPath = Path.Combine(Path.GetDirectoryName(directoryPath), Path.GetFileName(directoryPath).Replace(currentSolutionName, newSolutionName))
-                    Directory.Move(directoryPath, newDirectoryPath)
-                    LogMessage($"Renamed folder: {directoryPath} to {newDirectoryPath}")
+            For Each directoryPath In directories
+                If Path.GetFileName(directoryPath).Contains(currentSolutionName) Then
+                    Try
+                        Dim newDirectoryPath = Path.Combine(Path.GetDirectoryName(directoryPath), Path.GetFileName(directoryPath).Replace(currentSolutionName, newSolutionName))
+                        Directory.Move(directoryPath, newDirectoryPath)
+                        LogMessage($"Renamed folder: {directoryPath} to {newDirectoryPath}")
 
-                    ' Update any references to the old folder path in files
-                    For Each filePath In files
-                        Try
-                            Dim fileContent As String = File.ReadAllText(filePath)
-                            Dim updatedContent As String = fileContent.Replace(directoryPath, newDirectoryPath)
-                            If fileContent <> updatedContent Then
-                                File.WriteAllText(filePath, updatedContent)
-                                LogMessage($"Updated folder path in file: {filePath}")
-                            End If
-                        Catch ex As UnauthorizedAccessException
-                            LogMessage($"Access denied: {filePath}")
-                        Catch ex As IOException
-                            LogMessage($"Error updating path in file {filePath}: {ex.Message}")
-                        End Try
-                    Next
+                        ' Update any references to the old folder path in files
+                        For Each filePath In files
+                            Try
+                                Dim fileContent As String = File.ReadAllText(filePath)
+                                Dim updatedContent As String = fileContent.Replace(directoryPath, newDirectoryPath)
+                                If fileContent <> updatedContent Then
+                                    File.WriteAllText(filePath, updatedContent)
+                                    LogMessage($"Updated folder path in file: {filePath}")
+                                End If
+                            Catch ex As UnauthorizedAccessException
+                                LogMessage($"Access denied: {filePath}")
+                            Catch ex As IOException
+                                LogMessage($"Error updating path in file {filePath}: {ex.Message}")
+                            End Try
+                        Next
 
-                Catch ex As UnauthorizedAccessException
-                    LogMessage($"Access denied: {directoryPath}")
-                Catch ex As IOException
-                    LogMessage($"Error renaming folder {directoryPath}: {ex.Message}")
-                End Try
-            End If
-        Next
+                    Catch ex As UnauthorizedAccessException
+                        LogMessage($"Access denied: {directoryPath}")
+                    Catch ex As IOException
+                        LogMessage($"Error renaming folder {directoryPath}: {ex.Message}")
+                    End Try
+                End If
+            Next
+        Else
+            LogMessage("Skipping folder renaming as checkbox is unchecked.")
+        End If
 
         ' Step 3: Rename files with the old solution name in their filename
         For Each filePath In files
@@ -124,23 +128,27 @@ Public Class frmMain
             End Try
         End If
 
-        ' Step 5: Rename the main project folder (solution directory)
-        Dim parentDirectory = Path.GetDirectoryName(solutionDirectory)
-        Dim newSolutionDirectory = Path.Combine(parentDirectory, newSolutionName)
-        If Directory.Exists(solutionDirectory) Then
-            Try
-                If solutionDirectory <> newSolutionDirectory Then
-                    Thread.Sleep(500)  ' Delay to ensure no lingering file handles
-                    Directory.Move(solutionDirectory, newSolutionDirectory)
-                    LogMessage($"Renamed main project folder: {solutionDirectory} to {newSolutionDirectory}")
-                End If
-            Catch ex As UnauthorizedAccessException
-                LogMessage($"Access denied when renaming main project folder: {ex.Message}")
-            Catch ex As IOException
-                LogMessage($"Error renaming main project folder: {ex.Message}")
-            End Try
+        ' Step 5: Rename the main project folder (solution directory) only if checkbox is checked
+        If chkRenameFolder.Checked Then
+            Dim parentDirectory = Path.GetDirectoryName(solutionDirectory)
+            Dim newSolutionDirectory = Path.Combine(parentDirectory, newSolutionName)
+            If Directory.Exists(solutionDirectory) Then
+                Try
+                    If solutionDirectory <> newSolutionDirectory Then
+                        Thread.Sleep(500)  ' Delay to ensure no lingering file handles
+                        Directory.Move(solutionDirectory, newSolutionDirectory)
+                        LogMessage($"Renamed main project folder: {solutionDirectory} to {newSolutionDirectory}")
+                    End If
+                Catch ex As UnauthorizedAccessException
+                    LogMessage($"Access denied when renaming main project folder: {ex.Message}")
+                Catch ex As IOException
+                    LogMessage($"Error renaming main project folder: {ex.Message}")
+                End Try
+            Else
+                LogMessage($"Main project folder not found: {solutionDirectory}")
+            End If
         Else
-            LogMessage($"Main project folder not found: {solutionDirectory}")
+            LogMessage("Skipping main project folder renaming as checkbox is unchecked.")
         End If
 
         LogMessage("Solution rename process complete!")

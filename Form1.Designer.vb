@@ -29,6 +29,7 @@ Partial Class frmMain
         Me.Label1 = New System.Windows.Forms.Label()
         Me.Label2 = New System.Windows.Forms.Label()
         Me.txtLog = New System.Windows.Forms.TextBox()
+        Me.chkRenameFolder = New System.Windows.Forms.CheckBox()
         Me.SuspendLayout()
         '
         'btnOpenSolution
@@ -92,11 +93,22 @@ Partial Class frmMain
         Me.txtLog.Size = New System.Drawing.Size(921, 492)
         Me.txtLog.TabIndex = 6
         '
+        'chkRenameFolder
+        '
+        Me.chkRenameFolder.AutoSize = True
+        Me.chkRenameFolder.Location = New System.Drawing.Point(593, 54)
+        Me.chkRenameFolder.Name = "chkRenameFolder"
+        Me.chkRenameFolder.Size = New System.Drawing.Size(171, 17)
+        Me.chkRenameFolder.TabIndex = 7
+        Me.chkRenameFolder.Text = "Rename project folder as well?"
+        Me.chkRenameFolder.UseVisualStyleBackColor = True
+        '
         'frmMain
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(945, 602)
+        Me.Controls.Add(Me.chkRenameFolder)
         Me.Controls.Add(Me.txtLog)
         Me.Controls.Add(Me.Label2)
         Me.Controls.Add(Me.Label1)
@@ -122,4 +134,5 @@ Partial Class frmMain
     Friend WithEvents Label1 As Label
     Friend WithEvents Label2 As Label
     Friend WithEvents txtLog As TextBox
+    Friend WithEvents chkRenameFolder As CheckBox
 End Class
