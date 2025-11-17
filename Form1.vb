@@ -13,7 +13,7 @@ Public Class frmMain
 
     Private Sub btnOpenSolution_Click(sender As Object, e As EventArgs) Handles btnOpenSolution.Click
         Using openFileDialog As New OpenFileDialog
-            openFileDialog.Filter = "Solution Files (*.sln)|*.sln"
+            openFileDialog.Filter = "Solution Files (*.sln;*.slnx)|*.sln;*.slnx"
             If openFileDialog.ShowDialog() = DialogResult.OK Then
                 currentSolutionPath = openFileDialog.FileName
                 currentSolutionName = Path.GetFileNameWithoutExtension(currentSolutionPath)
@@ -31,6 +31,7 @@ Public Class frmMain
 
         Dim newSolutionName As String = txtNewSolutionName.Text
         Dim solutionDirectory = Path.GetDirectoryName(currentSolutionPath)
+        Dim originalExtension As String = Path.GetExtension(currentSolutionPath)
 
         LogMessage("Starting rename process...")
 
@@ -59,7 +60,7 @@ Public Class frmMain
             End Try
         Next
 
-        ' Step 2: Rename folders only if checkbox is checked 
+        ' Step 2: Rename folders only if checkbox is checked
         If chkRenameFolder.Checked Then
             Dim directories = Directory.GetDirectories(solutionDirectory, "*", SearchOption.AllDirectories).OrderByDescending(Function(d) d.Length).ToList()
 
@@ -115,7 +116,7 @@ Public Class frmMain
         Next
 
         ' Step 4: Rename the main solution file only if not already renamed
-        Dim newSolutionFilePath = Path.Combine(solutionDirectory, newSolutionName & ".sln")
+        Dim newSolutionFilePath = Path.Combine(solutionDirectory, newSolutionName & originalExtension)
         If currentSolutionPath <> newSolutionFilePath AndAlso File.Exists(currentSolutionPath) Then
             Try
                 File.Move(currentSolutionPath, newSolutionFilePath)
